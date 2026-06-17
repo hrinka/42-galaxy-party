@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>42 Galaxy Party III</title>
+<style>
+  :root{ --blue:#5aa9ff; --txt:#dfeaff; --term:#7CFC9E;
+    /* タイトル：Party LET Plain / 情報：Papyrus / コマンド：等幅 */
+    --font-title:'Party LET','PartyLetPlain','Brush Script MT','Segoe Script',cursive;
+    --font-info:'Papyrus','Papyrus W01','HG行書体',fantasy;
+    --font-term:'Courier New',ui-monospace,monospace; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#000;color:var(--txt);
+    font-family:var(--font-info);overflow-x:hidden}
+
+  /* === 実フライヤー PNG レイヤー（あれば使用） === */
+  #flyerbg{position:fixed;inset:0;z-index:0;background:#000 center/cover no-repeat;
+    opacity:0;transition:opacity 1.2s ease}
+  body.has-flyer #flyerbg{opacity:1;
+    animation:kenburns 26s ease-in-out infinite alternate}
+  @keyframes kenburns{
+    0%{transform:scale(1.0) translate(0,0)}
+    100%{transform:scale(1.16) translate(0,-1.5%)}}
+
+  /* === canvas（PNGが無ければ銀河本体／あれば星のきらめきだけ） === */
+  #galaxy{position:fixed;inset:0;width:100%;height:100%;z-index:1;display:block}
+
+  .vignette{position:fixed;inset:0;z-index:2;pointer-events:none;
+    background:radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,.6) 100%)}
+
+  .wrap{position:relative;z-index:3;min-height:100%;
+    display:flex;flex-direction:column;align-items:center;
+    padding:max(env(safe-area-inset-top),24px) 20px 60px;text-align:center}
+
+  .term{margin-top:7vh;font-family:var(--font-term);font-size:13px;color:var(--term);
+    letter-spacing:.5px;min-height:20px;text-shadow:0 0 8px rgba(124,252,158,.5)}
+  .term .cursor{display:inline-block;width:9px;background:var(--term);
+    animation:blink 1s steps(1) infinite;color:transparent}
+  @keyframes blink{50%{opacity:0}}
+
+  .reveal{opacity:0;transform:translateY(14px);
+    transition:opacity 1.1s ease,transform 1.1s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  /* タイトル等は canvas モードのみ表示（PNGには既に印字済み） */
+  body.has-flyer .only-canvas{display:none}
+
+  .title{margin-top:18px;font-family:var(--font-title);
+    font-size:clamp(40px,12vw,84px);line-height:1;color:#fff;
+    text-shadow:0 0 18px rgba(90,169,255,.8),0 0 40px rgba(90,169,255,.4)}
+  .numeral{font-family:var(--font-title);font-size:clamp(34px,9vw,60px);
+    letter-spacing:8px;color:#fff;margin-top:6px;text-shadow:0 0 16px rgba(90,169,255,.7)}
+  .date{margin-top:22px;font-size:clamp(20px,6vw,32px);color:#fff;letter-spacing:2px;
+    text-shadow:0 0 14px rgba(90,169,255,.6)}
+  .meta{margin-top:10px;font-size:13px;line-height:1.9;letter-spacing:1px}
+  .meta b{color:var(--blue)}
+
+  /* has-flyer 時は中身を下方に寄せて、フライヤーを主役に */
+  body.has-flyer .spacer{height:46vh}
+
+  .cd-label{margin-top:30px;font-size:11px;letter-spacing:4px;color:var(--blue);
+    text-shadow:0 0 10px rgba(0,0,0,.9)}
+  .cd{display:flex;gap:10px;justify-content:center;margin-top:12px}
+  .cd .box{min-width:62px;padding:10px 6px;border:1px solid rgba(90,169,255,.4);
+    border-radius:10px;background:rgba(6,14,34,.6);backdrop-filter:blur(3px)}
+  .cd .num{font-size:26px;font-weight:bold;color:#fff;text-shadow:0 0 10px rgba(90,169,255,.6)}
+  .cd .unit{font-size:9px;letter-spacing:2px;color:var(--blue);margin-top:4px}
+
+  .enter{margin-top:40px;display:inline-block;text-decoration:none;
+    padding:16px 42px;font-size:16px;letter-spacing:3px;font-weight:bold;color:#eaf3ff;
+    border:1.5px solid var(--blue);border-radius:40px;
+    background:linear-gradient(180deg,rgba(40,90,170,.5),rgba(10,28,70,.55));
+    box-shadow:0 0 22px rgba(90,169,255,.5),inset 0 0 18px rgba(90,169,255,.2);
+    animation:pulse 2.4s ease-in-out infinite;transition:transform .15s ease}
+  .enter:active{transform:scale(.96)}
+  .enter .arrow{margin-left:8px}
+  @keyframes pulse{0%,100%{box-shadow:0 0 18px rgba(90,169,255,.4),inset 0 0 14px rgba(90,169,255,.15)}
+    50%{box-shadow:0 0 36px rgba(90,169,255,.9),inset 0 0 22px rgba(90,169,255,.35)}}
+  .enter-note{margin-top:10px;font-size:11px;color:#a9bfe0;letter-spacing:1px;
+    text-shadow:0 0 8px rgba(0,0,0,.9)}
+
+  /* === MEMBERS ONLY ゲート === */
+  .gate{margin-top:40px;width:100%;max-width:360px}
+  .gate-head{font-family:var(--font-term);font-size:12px;letter-spacing:5px;color:var(--blue);
+    text-shadow:0 0 10px rgba(90,169,255,.5)}
+  .gate-cmd{font-family:var(--font-term);font-size:12px;color:var(--term);margin-top:10px;
+    text-shadow:0 0 8px rgba(124,252,158,.5)}
+  .gate-form{display:flex;align-items:stretch;gap:8px;margin-top:14px;
+    padding:6px 6px 6px 12px;border:1.5px solid var(--blue);border-radius:14px;
+    background:rgba(6,14,34,.6);backdrop-filter:blur(3px);
+    box-shadow:0 0 22px rgba(90,169,255,.4),inset 0 0 16px rgba(90,169,255,.12)}
+  .gate-prompt{align-self:center;font-family:var(--font-term);color:var(--term);font-size:16px}
+  .gate-input{flex:1;min-width:0;background:transparent;border:0;outline:none;
+    font-family:var(--font-term);font-size:16px;letter-spacing:3px;color:#fff}
+  .gate-input::placeholder{color:#5f7aa6;letter-spacing:2px}
+  .gate-btn{flex:none;font-family:var(--font-info);font-weight:bold;font-size:14px;letter-spacing:2px;
+    color:#eaf3ff;cursor:pointer;border:0;border-radius:10px;padding:10px 16px;
+    background:linear-gradient(180deg,rgba(40,90,170,.9),rgba(10,28,70,.95));
+    box-shadow:0 0 14px rgba(90,169,255,.5);transition:transform .12s ease}
+  .gate-btn:active{transform:scale(.95)}
+  .gate-form.ok{border-color:var(--term);box-shadow:0 0 26px rgba(124,252,158,.6)}
+  .gate-form.shake{animation:shake .4s}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}
+    40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(4px)}}
+  .gate-msg{margin-top:12px;font-family:var(--font-term);font-size:12px;letter-spacing:1px;
+    color:#a9bfe0;min-height:18px;text-shadow:0 0 8px rgba(0,0,0,.9)}
+
+  .map-wrap{margin-top:40px;width:100%;max-width:520px}
+  .map-wrap h3{font-size:12px;letter-spacing:3px;color:var(--blue);margin-bottom:14px}
+  .venue{margin-top:18px;text-shadow:0 0 8px rgba(0,0,0,.9)}
+  .venue-name{font-size:17px;color:#fff;letter-spacing:1px}
+  .venue-name span{font-size:12px;color:var(--blue)}
+  .venue-addr{margin-top:6px;font-size:13px;color:var(--txt)}
+  .access{list-style:none;margin-top:10px;display:inline-block;text-align:left}
+  .access li{font-size:12.5px;line-height:1.9;color:var(--txt);padding-left:16px;position:relative}
+  .access li::before{content:"›";position:absolute;left:2px;color:var(--blue)}
+  .map-frame{position:relative;width:100%;aspect-ratio:16/10;border-radius:14px;
+    overflow:hidden;border:1px solid rgba(90,169,255,.3);box-shadow:0 0 24px rgba(90,169,255,.25)}
+  .map-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;filter:saturate(.9)}
+  .map-link{display:inline-block;margin-top:12px;font-size:12px;color:var(--blue);
+    text-decoration:none;border-bottom:1px dashed var(--blue)}
+  .cta-join{margin-top:40px;width:100%;max-width:520px;padding:18px 16px;
+    border:1px solid rgba(90,169,255,.35);border-radius:14px;
+    background:rgba(6,14,34,.5);backdrop-filter:blur(3px);text-shadow:0 0 8px rgba(0,0,0,.9)}
+  .cta-q{font-size:13px;color:var(--txt);letter-spacing:1px}
+  .cta-a{margin-top:8px;font-size:16px;color:#fff;letter-spacing:1px}
+  .cta-a b{color:var(--blue);font-weight:bold}
+  .footer{margin-top:36px;font-size:11px;color:#8aa0c6;letter-spacing:2px;text-shadow:0 0 8px rgba(0,0,0,.9)}
+
+  /* ===== レスポンシブ ===== */
+  /* 小型スマホ（〜380px）：カウントダウンと入力欄を詰める */
+  @media (max-width:380px){
+    .wrap{padding-left:14px;padding-right:14px}
+    .cd{gap:6px}
+    .cd .box{min-width:0;flex:1;padding:8px 2px}
+    .cd .num{font-size:21px}
+    .cd .unit{font-size:8px;letter-spacing:1px}
+    .gate{max-width:100%}
+    .gate-btn{padding:10px 12px;font-size:13px}
+    .meta{font-size:12px}
+  }
+  /* タブレット〜PC（700px〜）：中央寄せして読みやすく、余白を確保 */
+  @media (min-width:700px){
+    .wrap{padding-top:max(env(safe-area-inset-top),40px);padding-bottom:80px}
+    .term{margin-top:9vh;font-size:15px}
+    .meta{font-size:15px}
+    .cd .box{min-width:78px;padding:14px 10px}
+    .cd .num{font-size:32px}
+    .gate{max-width:420px}
+    .map-wrap{max-width:620px}
+  }
+  /* 横向き・低い画面：縦詰めを緩和 */
+  @media (max-height:520px){
+    .term{margin-top:24px}
+    .title{margin-top:10px}
+  }
+</style>
+</head>
+<body>
+<div id="flyerbg"></div>
+<canvas id="galaxy"></canvas>
+<div class="vignette"></div>
+
+<div class="wrap">
+  <div class="term" id="term"><span class="cursor">_</span></div>
+
+  <h1 class="title reveal only-canvas" id="r1">42 Galaxy Party</h1>
+  <div class="numeral reveal only-canvas" id="r2">III</div>
+  <div class="date reveal only-canvas" id="r3">2026 . 07 . 03 <span style="font-size:.6em">(FRI)</span></div>
+  <div class="meta reveal only-canvas" id="r4">
+    OPEN <b>18:00</b> &nbsp;/&nbsp; CLOSE <b>21:30</b><br>
+    DOOR : <b>¥3500</b><br>
+    - FREE DRINK &amp; FOOD -<br>
+    @ WPÜ GALLERY SHINJUKU
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="cd-label reveal" id="r5">&gt; COUNTDOWN TO LAUNCH</div>
+  <div class="cd reveal" id="r5b">
+    <div class="box"><div class="num" id="d">--</div><div class="unit">DAYS</div></div>
+    <div class="box"><div class="num" id="h">--</div><div class="unit">HOURS</div></div>
+    <div class="box"><div class="num" id="m">--</div><div class="unit">MIN</div></div>
+    <div class="box"><div class="num" id="s">--</div><div class="unit">SEC</div></div>
+  </div>
+
+  <div class="gate reveal" id="r6">
+    <div class="gate-head">— MEMBERS ONLY —</div>
+    <div class="gate-cmd">$ access --members-only</div>
+    <form class="gate-form" id="gateForm" autocomplete="off" onsubmit="return submitCode(event)">
+      <span class="gate-prompt">&gt;</span>
+      <input id="code" class="gate-input" type="text" inputmode="numeric"
+             maxlength="8" placeholder="ACCESS CODE" aria-label="access code">
+      <button class="gate-btn" type="submit">ENTER →</button>
+    </form>
+    <div class="gate-msg" id="gateMsg"></div>
+  </div>
+
+  <div class="map-wrap reveal" id="r7">
+    <h3>&gt; VENUE / ACCESS</h3>
+    <div class="map-frame">
+      <iframe loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+        src="https://maps.google.com/maps?q=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%96%B0%E5%AE%BF%E5%8C%BA%E8%A5%BF%E6%96%B0%E5%AE%BF7-10-5%20WP%C3%9C%20SHINJUKU&z=17&output=embed"></iframe>
+    </div>
+    <a class="map-link" target="_blank" rel="noopener"
+       href="https://maps.google.com/maps?q=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%96%B0%E5%AE%BF%E5%8C%BA%E8%A5%BF%E6%96%B0%E5%AE%BF7-10-5%20WP%C3%9C%20SHINJUKU">Google マップで開く →</a>
+    <div class="venue">
+      <div class="venue-name">WPÜ GALLERY SHINJUKU <span>（ホテル2F）</span></div>
+      <div class="venue-addr">〒160-0023 東京都新宿区西新宿7-10-5</div>
+      <ul class="access">
+        <li>都営大江戸線「新宿西口駅」D5出口 徒歩1分</li>
+        <li>東京メトロ丸ノ内線「新宿駅」D3出口 徒歩2分</li>
+        <li>JR「新宿駅」西口 徒歩5分</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="cta-join reveal" id="r7b">
+    <div class="cta-q">出店・出演をご希望の方はこちら</div>
+    <div class="cta-a">→ Discord <b>@hirosuzu</b> まで</div>
+  </div>
+
+  <div class="footer reveal" id="r8">$ all devs welcome — let's build smth</div>
+</div>
+
+<script>
+/* ====== 設定：ここを差し替え ====== */
+const CHOSEISAN_URL = "https://chouseisan.com/s?h=2cec6dfdc7f34e39b1d4e9bb5a665d97"; // ← 調整さん本番URL
+const ACCESS_CODE   = "42";  // ← members only の合言葉
+/* フライヤー画像を背景に使うか。false = canvas銀河＋HTMLテキスト（推奨） */
+const USE_FLYER = false;
+/* フライヤー画像の候補（USE_FLYER=true のとき使用・大文字小文字対応） */
+const FLYER_CANDIDATES = ["flyer.png","flyer.PNG","flyer.jpg","flyer.JPG","flyer.jpeg","flyer.webp"];
+
+/* ====== MEMBERS ONLY：合言葉チェック ====== */
+function submitCode(e){
+  e.preventDefault();
+  const input=document.getElementById('code');
+  const msg=document.getElementById('gateMsg');
+  const form=document.getElementById('gateForm');
+  const v=input.value.trim();
+  if(v===ACCESS_CODE){
+    form.classList.add('ok');
+    msg.style.color='var(--term)';
+    msg.textContent='ACCESS GRANTED — welcome, dev. entering the galaxy…';
+    setTimeout(()=>{ window.location.href=CHOSEISAN_URL; }, 1100);
+  }else{
+    form.classList.remove('shake'); void form.offsetWidth; form.classList.add('shake');
+    msg.style.color='#ff6b6b';
+    msg.textContent='ACCESS DENIED — code "'+(v||'(空欄)')+'" is not recognized.';
+    input.select();
+  }
+  return false;
+}
+
+/* ====== フライヤー画像の有無を判定（候補を順に試す） ====== */
+let HAS_FLYER=false;
+(function(){
+  if(!USE_FLYER){HAS_FLYER=false;return;}
+  let i=0;
+  const tryNext=()=>{
+    if(i>=FLYER_CANDIDATES.length){HAS_FLYER=false;return;}
+    const src=FLYER_CANDIDATES[i++];
+    const img=new Image();
+    img.onload=()=>{HAS_FLYER=true;document.body.classList.add('has-flyer');
+      document.getElementById('flyerbg').style.backgroundImage="url('"+src+"')";};
+    img.onerror=tryNext;
+    img.src=src;
+  };
+  tryNext();
+})();
+
+/* ====== 銀河 + サイバー空間 canvas ====== */
+const cv=document.getElementById('galaxy'),ctx=cv.getContext('2d');
+let W,H,DPR,cx,cy,arms=[],bg=[],nodes=[],neb=[];
+const rnd=(a,b)=>a+Math.random()*(b-a);
+function resize(){
+  DPR=Math.min(window.devicePixelRatio||1,2);
+  W=cv.width=innerWidth*DPR;H=cv.height=innerHeight*DPR;
+  cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';
+  cx=W/2;cy=H*0.44;build();
+}
+function build(){
+  arms=[];bg=[];nodes=[];neb=[];
+  const R=Math.min(W,H)*0.66;
+  // --- 渦状腕：4本のゆるい渦＋星形成領域(HII)---
+  const ARMS=8,perArm=Math.floor(240+ (W*H)/(8000*DPR));
+  for(let a=0;a<ARMS;a++){const base=a*(Math.PI*2/ARMS)+(Math.random()-0.5)*0.3;
+    const wind=3.4+(Math.random()-0.5)*0.6;               // 腕ごとに巻きを少し変える
+    for(let i=0;i<perArm;i++){
+      const t=Math.pow(i/perArm,0.85);
+      const ang=base + t*wind + (Math.random()-0.5)*0.28;
+      const rad=t*R + (Math.random()-0.5)*20*DPR;
+      let col,size,b;const r=Math.random();
+      if(t<0.14){col='255,238,205';size=rnd(.6,1.8);b=rnd(.7,1);}
+      else if(r<0.07){col='255,150,200';size=rnd(.8,2.2);b=rnd(.6,1);}     // ピンクのHII領域
+      else if(t<0.5){col='205,224,255';size=rnd(.5,1.5);b=rnd(.45,.85);}
+      else{col='120,170,255';size=rnd(.4,1.2);b=rnd(.25,.6);}
+      arms.push({rad,ang,sp:0.00016/(0.28+t),size:size*DPR,b,col,tw:Math.random()*6.28});}}
+  // --- 円盤の薄いもや星 ---
+  for(let i=0;i<400;i++){const t=Math.sqrt(Math.random());
+    arms.push({rad:t*R,ang:Math.random()*6.28,sp:0.00016/(0.28+t),
+      size:rnd(.3,.9)*DPR,b:rnd(.1,.35),col:'150,185,255',tw:Math.random()*6.28});}
+  // --- 背景星（一部は十字グロー）---
+  const n=Math.floor((W*H)/(7000*DPR));
+  for(let i=0;i<n;i++){const big=Math.random()<0.06;
+    bg.push({x:Math.random()*W,y:Math.random()*H,r:(big?rnd(1.2,2):rnd(.3,1))*DPR,
+      tw:Math.random()*6.28,sp:rnd(.01,.05),big});}
+  // --- ネビュラ（もや雲）---
+  const cols=[[80,120,255],[150,80,220],[40,180,200],[80,120,255]];
+  for(let i=0;i<4;i++)neb.push({x:cx+rnd(-.3,.3)*W,y:cy+rnd(-.3,.3)*H,
+    r:rnd(.25,.5)*Math.min(W,H),c:cols[i],ph:Math.random()*6.28});
+  // --- サイバー・ネットワーク節点 ---
+  const nn=Math.min(70,Math.floor(W*H/(26000*DPR)));
+  for(let i=0;i<nn;i++)nodes.push({x:Math.random()*W,y:Math.random()*H,
+    vx:rnd(-.12,.12)*DPR,vy:rnd(-.12,.12)*DPR});
+}
+function draw(ts){
+  ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;
+  if(HAS_FLYER){ctx.clearRect(0,0,W,H);}else{ctx.fillStyle='#000308';ctx.fillRect(0,0,W,H);}
+
+  if(!HAS_FLYER){
+    // ネビュラ
+    ctx.globalCompositeOperation='lighter';
+    for(const b of neb){const pr=b.r*(0.92+0.08*Math.sin(ts*0.0003+b.ph));
+      const g=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,pr);
+      g.addColorStop(0,'rgba('+b.c[0]+','+b.c[1]+','+b.c[2]+',0.10)');
+      g.addColorStop(1,'rgba('+b.c[0]+','+b.c[1]+','+b.c[2]+',0)');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(b.x,b.y,pr,0,6.3);ctx.fill();}
+  }
+
+  // 背景星（きらめき）
+  ctx.globalCompositeOperation='lighter';
+  for(const s of bg){const a=Math.max(0,0.3+0.6*Math.sin(ts*0.001*s.sp*60+s.tw))*(HAS_FLYER?0.7:1);
+    ctx.globalAlpha=a;ctx.fillStyle='#dceafe';
+    ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,6.3);ctx.fill();
+    if(s.big){ctx.globalAlpha=a*0.5;
+      ctx.fillRect(s.x-s.r*3,s.y-s.r*0.18,s.r*6,s.r*0.36);
+      ctx.fillRect(s.x-s.r*0.18,s.y-s.r*3,s.r*0.36,s.r*6);}}
+  ctx.globalAlpha=1;
+
+  if(!HAS_FLYER){
+    // 渦状腕（傾いた楕円円盤・差動回転）※中心の発光は無し、粒の密度で核を表現
+    const TILT=0.48, DR=-0.18, cR=Math.cos(DR), sR=Math.sin(DR);
+    for(const p of arms){p.ang+=p.sp;
+      const px=Math.cos(p.ang)*p.rad, py=Math.sin(p.ang)*p.rad*TILT;
+      const x=cx+px*cR-py*sR, y=cy+px*sR+py*cR;
+      const tw=0.65+0.35*Math.sin(ts*0.002+p.tw);
+      ctx.globalAlpha=p.b*tw;ctx.fillStyle='rgba('+p.col+',1)';
+      ctx.beginPath();ctx.arc(x,y,p.size,0,6.3);ctx.fill();}
+    ctx.globalAlpha=1;
+  }
+
+  // サイバー・ネットワーク（節点＋接続線）
+  for(const nd of nodes){nd.x+=nd.vx;nd.y+=nd.vy;
+    if(nd.x<0||nd.x>W)nd.vx*=-1;if(nd.y<0||nd.y>H)nd.vy*=-1;}
+  const D=140*DPR;ctx.lineWidth=DPR;
+  for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
+    const dx=nodes[i].x-nodes[j].x,dy=nodes[i].y-nodes[j].y,d=Math.hypot(dx,dy);
+    if(d<D){ctx.globalAlpha=(1-d/D)*0.16;ctx.strokeStyle='rgba(90,210,235,1)';
+      ctx.beginPath();ctx.moveTo(nodes[i].x,nodes[i].y);ctx.lineTo(nodes[j].x,nodes[j].y);ctx.stroke();}}
+  for(const nd of nodes){ctx.globalAlpha=0.5;ctx.fillStyle='rgba(120,225,245,1)';
+    ctx.beginPath();ctx.arc(nd.x,nd.y,1.4*DPR,0,6.3);ctx.fill();}
+  ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+
+  requestAnimationFrame(draw);
+}
+addEventListener('resize',resize);resize();requestAnimationFrame(draw);
+
+/* ====== ターミナル風タイピング ====== */
+const termEl=document.getElementById('term');
+const line="$ ./join_42_galaxy_party.sh --enter";let idx=0;
+function type(){
+  if(idx<=line.length){termEl.innerHTML=line.slice(0,idx)+'<span class="cursor">_</span>';
+    idx++;setTimeout(type,55+Math.random()*40);}
+  else{termEl.innerHTML=line+' <span style="color:#8ad">✓</span><span class="cursor">_</span>';
+    setTimeout(revealAll,350);}
+}
+function revealAll(){
+  ['r1','r2','r3','r4','r5','r5b','r6','r7','r7b','r8'].forEach((id,i)=>
+    setTimeout(()=>{const el=document.getElementById(id);if(el)el.classList.add('in');},i*220));
+}
+setTimeout(type,500);
+
+/* ====== カウントダウン (JST固定) ====== */
+const target=new Date('2026-07-03T18:00:00+09:00').getTime();
+function tick(){
+  let diff=target-Date.now();if(diff<0)diff=0;
+  document.getElementById('d').textContent=String(Math.floor(diff/86400000));
+  document.getElementById('h').textContent=String(Math.floor(diff%86400000/3600000)).padStart(2,'0');
+  document.getElementById('m').textContent=String(Math.floor(diff%3600000/60000)).padStart(2,'0');
+  document.getElementById('s').textContent=String(Math.floor(diff%60000/1000)).padStart(2,'0');
+}
+tick();setInterval(tick,1000);
+</script>
+</body>
+</html>
