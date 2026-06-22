@@ -120,12 +120,57 @@
   .map-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;filter:saturate(.9)}
   .map-link{display:inline-block;margin-top:12px;font-size:12px;color:var(--blue);
     text-decoration:none;border-bottom:1px dashed var(--blue)}
+  .lineup{margin-top:38px;width:100%;max-width:420px}
+  .lineup h3{font-size:12px;letter-spacing:3px;color:var(--blue);margin-bottom:14px}
+  .line-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+  .line-list li{display:flex;align-items:center;gap:12px;text-align:left;
+    padding:11px 14px;border:1px solid rgba(90,169,255,.3);border-radius:12px;
+    background:rgba(6,14,34,.5);backdrop-filter:blur(3px);text-shadow:0 0 8px rgba(0,0,0,.9)}
+  .line-list .tag{flex:none;font-family:var(--font-term);font-size:13px;font-weight:bold;
+    letter-spacing:1px;color:#001018;background:var(--blue);border-radius:7px;
+    padding:5px 0;min-width:46px;text-align:center;box-shadow:0 0 12px rgba(90,169,255,.5)}
+  .line-list .ld{font-size:14px;color:#fff;letter-spacing:.5px}
+  .line-more{margin-top:12px;font-size:12px;color:#90a8d0;letter-spacing:3px}
+
+  /* 宇宙みくじ（縁日ガチャ）*/
+  .omikuji{margin-top:40px;width:100%;max-width:420px}
+  .omikuji h3{font-size:12px;letter-spacing:3px;color:#ffb27a;margin-bottom:14px}
+  .omikuji-btn{font-family:var(--font-info);font-size:16px;font-weight:bold;letter-spacing:2px;
+    color:#2a0d00;cursor:pointer;border:0;border-radius:40px;padding:14px 34px;
+    background:linear-gradient(180deg,#ffd27a,#ff924d);
+    box-shadow:0 0 22px rgba(255,150,80,.6);transition:transform .12s ease}
+  .omikuji-btn:active{transform:scale(.95)}
+  .omikuji-btn:disabled,.omikuji-btn.drawn{background:linear-gradient(180deg,#7a6a55,#5a4a3a);
+    color:#e6d8c2;cursor:default;box-shadow:none;transform:none}
+  .omikuji-card{margin-top:16px;opacity:0;transform:translateY(10px) scale(.96);
+    border:1px solid rgba(255,170,110,.5);border-radius:14px;padding:18px 16px;
+    background:rgba(30,12,6,.6);backdrop-filter:blur(3px);min-height:0;display:none}
+  .omikuji-card.show{display:block;animation:omkpop .5s ease forwards}
+  @keyframes omkpop{0%{opacity:0;transform:translateY(10px) scale(.96)}
+    100%{opacity:1;transform:none}}
+  .omk-lv{font-family:var(--font-title);font-size:clamp(36px,11vw,56px);line-height:1;
+    color:#ffd98a;text-shadow:0 0 18px rgba(255,180,90,.7)}
+  .omk-lv.daikichi{color:#ffe08a;text-shadow:0 0 24px rgba(255,200,90,.9)}
+  .omk-msg{margin-top:12px;font-size:15px;color:#fff;letter-spacing:.5px;line-height:1.7;
+    text-shadow:0 0 8px rgba(0,0,0,.9)}
+
   .cta-join{margin-top:40px;width:100%;max-width:520px;padding:18px 16px;
     border:1px solid rgba(90,169,255,.35);border-radius:14px;
     background:rgba(6,14,34,.5);backdrop-filter:blur(3px);text-shadow:0 0 8px rgba(0,0,0,.9)}
   .cta-q{font-size:13px;color:var(--txt);letter-spacing:1px}
   .cta-a{margin-top:8px;font-size:16px;color:#fff;letter-spacing:1px}
   .cta-a b{color:var(--blue);font-weight:bold}
+  .lamp-ctrl{margin-top:34px;width:100%;max-width:420px;display:flex;flex-direction:column;
+    align-items:center;gap:12px;padding:16px;border:1px solid rgba(255,170,110,.3);
+    border-radius:14px;background:rgba(20,10,6,.45);backdrop-filter:blur(3px)}
+  .lamp-label{font-size:12px;color:#ffb27a;letter-spacing:2px;text-shadow:0 0 8px rgba(0,0,0,.9)}
+  .swatches{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+  .sw{width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.35);
+    cursor:pointer;padding:0;box-shadow:0 0 10px rgba(0,0,0,.5);transition:transform .12s ease}
+  .sw:active{transform:scale(.88)}
+  .sw.mix{background:#1a1320;font-size:13px;line-height:1}
+  #lampColor{width:34px;height:30px;border:1px solid rgba(255,255,255,.35);border-radius:8px;
+    background:transparent;cursor:pointer;padding:0}
   .footer{margin-top:36px;font-size:11px;color:#8aa0c6;letter-spacing:2px;text-shadow:0 0 8px rgba(0,0,0,.9)}
 
   /* ===== レスポンシブ ===== */
@@ -186,7 +231,36 @@
   </div>
 
   <a class="enter reveal join-link" id="r6" target="_blank" rel="noopener">ENTER THE GALAXY<span class="arrow">→</span></a>
-  <div class="enter-note reveal" id="r6b">参加確認（調整さん）へ進む</div>
+
+  <div class="lamp-ctrl reveal" id="r7d">
+    <span class="lamp-label">CHOOSE YOUR COLOR</span>
+    <div class="swatches">
+      <button class="sw" style="background:#ff7a3c" onclick="setLanternColor('#ff7a3c')" aria-label="orange"></button>
+      <button class="sw" style="background:#ff4d6d" onclick="setLanternColor('#ff4d6d')" aria-label="pink"></button>
+      <button class="sw" style="background:#7ab8ff" onclick="setLanternColor('#7ab8ff')" aria-label="blue"></button>
+      <button class="sw" style="background:#7CFC9E" onclick="setLanternColor('#7CFC9E')" aria-label="green"></button>
+      <button class="sw" style="background:#c89bff" onclick="setLanternColor('#c89bff')" aria-label="purple"></button>
+      <input type="color" id="lampColor" value="#ff7a3c" oninput="setLanternColor(this.value)" aria-label="custom color">
+      <button class="sw mix" onclick="resetLanternColor()" aria-label="mix">🌈</button>
+    </div>
+  </div>
+
+  <div class="lineup reveal" id="r6c">
+    <h3>&gt; CONTENTS</h3>
+    <ul class="line-list">
+      <li><span class="tag">DJ</span><span class="ld">Cosmic Disco</span></li>
+      <li><span class="tag">LT</span><span class="ld">42 OB による LTトーク会</span></li>
+      <li><span class="tag">VJ</span><span class="ld">Sound Visualizer</span></li>
+      <li><span class="tag">FOOD</span><span class="ld">Free Drink &amp; Food</span></li>
+    </ul>
+    <div class="line-more">… and more</div>
+  </div>
+
+  <div class="omikuji reveal" id="r6d">
+    <h3>&gt; OMIKUJI</h3>
+    <button class="omikuji-btn" type="button" onclick="drawOmikuji()">おみくじを引く</button>
+    <div class="omikuji-card" id="omikujiCard"></div>
+  </div>
 
   <div class="map-wrap reveal" id="r7">
     <h3>&gt; VENUE / ACCESS</h3>
@@ -226,8 +300,75 @@ const USE_FLYER = false;
 /* フライヤー画像の候補（USE_FLYER=true のとき使用・大文字小文字対応） */
 const FLYER_CANDIDATES = ["flyer.png","flyer.PNG","flyer.jpg","flyer.JPG","flyer.jpeg","flyer.webp"];
 
+/* ====== 提灯の灯りの設定（ここで色・数・サイズを変えられます）====== */
+const LANTERN = {
+  // 灯りの色（R,G,B）。行を足す/消す/数値変更で自由に。例: 桃[255,120,180], 青[120,180,255]
+  colors: [
+    [255,120, 60],   // 橙
+    [255, 90, 70],   // 赤
+    [255,170, 80],   // 黄金
+    [255,140, 55]    // 山吹
+  ],
+  density: 70000,    // 数の密度：小さいほど多い（例 40000=増やす / 120000=減らす）
+  minCount: 18,      // 最低の数
+  sizeMin: 6,        // 光の最小サイズ
+  sizeMax: 13        // 光の最大サイズ
+};
+
 /* ====== 参加ボタン：調整さんURLを設定 ====== */
 document.querySelectorAll('.join-link').forEach(a=>{ a.href=CHOSEISAN_URL; });
+
+/* ====== 提灯の色：訪問者がリアルタイム変更 ====== */
+let userLanternColor=null;
+function hexToRgb(h){h=(h||'').replace('#','');
+  if(h.length===3)h=h.split('').map(c=>c+c).join('');
+  return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];}
+function setLanternColor(hex){
+  userLanternColor=hexToRgb(hex);
+  if(typeof lanterns!=='undefined')lanterns.forEach(L=>{L.c=userLanternColor;});
+  const inp=document.getElementById('lampColor');
+  if(inp&&inp.value.toLowerCase()!==hex.toLowerCase())inp.value=hex;}
+function resetLanternColor(){
+  userLanternColor=null;
+  if(typeof lanterns!=='undefined')lanterns.forEach(L=>{
+    L.c=LANTERN.colors[Math.floor(Math.random()*LANTERN.colors.length)];});}
+
+/* ====== 宇宙みくじ（縁日ガチャ）====== */
+const OMIKUJI=[
+  {lv:'大吉',msg:'今夜、最高のセッションに出会える。一杯目から飛ばしていこう。'},
+  {lv:'大吉',msg:'新しい仲間とつながる夜。名刺代わりにGitHubを交換せよ。'},
+  {lv:'中吉',msg:'LTで思わぬ学びがある予感。前のめりで聴くべし。'},
+  {lv:'中吉',msg:'DJのドロップで心がリフレッシュ。フロアへ向かおう。'},
+  {lv:'小吉',msg:'フリードリンクの一杯目が特に美味い夜。'},
+  {lv:'小吉',msg:'VJの光に見惚れて時間を忘れるかも。'},
+  {lv:'末吉',msg:'帰り道、星がいつもより綺麗に見える。'},
+  {lv:'吉',msg:'迷ったら話しかけてみよう。良い縁が待っている。'},
+  {lv:'大大吉',msg:'今夜のあなたは銀河の中心。誰かの伝説になる夜。'}
+];
+const OMK_KEY='omikuji-2026-07-03';
+let drawnFortune=null;
+function renderOmikuji(o,animate){
+  const card=document.getElementById('omikujiCard');
+  const big=(o.lv==='大吉'||o.lv==='大大吉')?' daikichi':'';
+  card.innerHTML='<div class="omk-lv'+big+'">'+o.lv+'</div><div class="omk-msg">'+o.msg+'</div>';
+  card.classList.add('show');
+  if(animate){card.classList.remove('show');void card.offsetWidth;card.classList.add('show');}
+  const btn=document.querySelector('.omikuji-btn');
+  if(btn){btn.disabled=true;btn.classList.add('drawn');btn.textContent='宇宙おみくじ';}
+}
+function drawOmikuji(){
+  if(drawnFortune){renderOmikuji(drawnFortune,false);return;}   // 一度引いたら固定
+  let saved=null;try{saved=localStorage.getItem(OMK_KEY);}catch(e){}
+  if(saved){try{drawnFortune=JSON.parse(saved);}catch(e){}}
+  if(!drawnFortune){
+    drawnFortune=OMIKUJI[Math.floor(Math.random()*OMIKUJI.length)];
+    try{localStorage.setItem(OMK_KEY,JSON.stringify(drawnFortune));}catch(e){}
+  }
+  renderOmikuji(drawnFortune,true);
+}
+/* 再読込時：既に引いていれば同じ結果を復元 */
+(function(){let saved=null;try{saved=localStorage.getItem(OMK_KEY);}catch(e){}
+  if(saved){try{drawnFortune=JSON.parse(saved);renderOmikuji(drawnFortune,false);}catch(e){}}})();
 
 /* ====== フライヤー画像の有無を判定（候補を順に試す） ====== */
 let HAS_FLYER=false;
@@ -248,7 +389,7 @@ let HAS_FLYER=false;
 
 /* ====== 銀河 + サイバー空間 canvas ====== */
 const cv=document.getElementById('galaxy'),ctx=cv.getContext('2d');
-let W,H,DPR,cx,cy,arms=[],bg=[],nodes=[],neb=[];
+let W,H,DPR,cx,cy,arms=[],bg=[],nodes=[],neb=[],lanterns=[];
 const rnd=(a,b)=>a+Math.random()*(b-a);
 function resize(){
   DPR=Math.min(window.devicePixelRatio||1,2);
@@ -257,7 +398,7 @@ function resize(){
   cx=W/2;cy=H*0.44;build();
 }
 function build(){
-  arms=[];bg=[];nodes=[];neb=[];
+  arms=[];bg=[];nodes=[];neb=[];lanterns=[];
   const R=Math.min(W,H)*0.66;
   // --- 渦状腕：4本のゆるい渦＋星形成領域(HII)---
   const ARMS=8,perArm=Math.floor(240+ (W*H)/(8000*DPR));
@@ -290,6 +431,13 @@ function build(){
   const nn=Math.min(70,Math.floor(W*H/(26000*DPR)));
   for(let i=0;i<nn;i++)nodes.push({x:Math.random()*W,y:Math.random()*H,
     vx:rnd(-.12,.12)*DPR,vy:rnd(-.12,.12)*DPR});
+  // --- 提灯の灯り（縁日）：設定 LANTERN に従って生成 ---
+  const lcols=userLanternColor?[userLanternColor]:LANTERN.colors;
+  const ln=Math.max(LANTERN.minCount,Math.floor(W*H/(LANTERN.density*DPR)));
+  for(let i=0;i<ln;i++)lanterns.push({x:Math.random()*W,y:rnd(.06,.95)*H,
+    base:Math.random()*6.28,sway:rnd(8,22)*DPR,
+    r:rnd(LANTERN.sizeMin,LANTERN.sizeMax)*DPR,
+    c:lcols[i%lcols.length],sp:rnd(.3,.7),fl:Math.random()*6.28});
 }
 function draw(ts){
   ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;
@@ -337,7 +485,23 @@ function draw(ts){
       ctx.beginPath();ctx.moveTo(nodes[i].x,nodes[i].y);ctx.lineTo(nodes[j].x,nodes[j].y);ctx.stroke();}}
   for(const nd of nodes){ctx.globalAlpha=0.5;ctx.fillStyle='rgba(120,225,245,1)';
     ctx.beginPath();ctx.arc(nd.x,nd.y,1.4*DPR,0,6.3);ctx.fill();}
-  ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+  ctx.globalAlpha=1;
+
+  // 提灯の灯り（縁日）— ふわっと揺れて灯る暖色の光
+  ctx.globalCompositeOperation='lighter';
+  for(const L of lanterns){
+    const x=L.x+Math.sin(ts*0.0004*L.sp+L.base)*L.sway;
+    const y=L.y+Math.cos(ts*0.0003*L.sp+L.base)*L.sway*0.4;
+    const fl=0.75+0.25*Math.sin(ts*0.004+L.fl);
+    const g=ctx.createRadialGradient(x,y,0,x,y,L.r*3.2);
+    g.addColorStop(0,'rgba('+L.c[0]+','+L.c[1]+','+L.c[2]+','+(0.9*fl)+')');
+    g.addColorStop(0.4,'rgba('+L.c[0]+','+L.c[1]+','+L.c[2]+','+(0.28*fl)+')');
+    g.addColorStop(1,'rgba('+L.c[0]+','+L.c[1]+','+L.c[2]+',0)');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,L.r*3.2,0,6.3);ctx.fill();
+    ctx.globalAlpha=fl;ctx.fillStyle='rgba(255,236,205,1)';
+    ctx.beginPath();ctx.arc(x,y,L.r*0.5,0,6.3);ctx.fill();ctx.globalAlpha=1;
+  }
+  ctx.globalCompositeOperation='source-over';
 
   requestAnimationFrame(draw);
 }
@@ -353,7 +517,7 @@ function type(){
     setTimeout(revealAll,350);}
 }
 function revealAll(){
-  ['r1','r2','r3','r4','r5','r5b','r6','r6b','r7','r7b','r7c','r8'].forEach((id,i)=>
+  ['r1','r2','r3','r4','r5','r5b','r6','r7d','r6c','r6d','r7','r7b','r7c','r8'].forEach((id,i)=>
     setTimeout(()=>{const el=document.getElementById(id);if(el)el.classList.add('in');},i*220));
 }
 setTimeout(type,500);
