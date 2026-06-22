@@ -214,7 +214,7 @@
   <div class="numeral reveal only-canvas" id="r2">III</div>
   <div class="date reveal only-canvas" id="r3">2026 . 07 . 03 <span style="font-size:.6em">(FRI)</span></div>
   <div class="meta reveal only-canvas" id="r4">
-    OPEN <b>18:00</b> &nbsp;/&nbsp; CLOSE <b>21:30</b><br>
+    OPEN <b>18:30</b> &nbsp;/&nbsp; CLOSE <b>21:30</b><br>
     DOOR : <b>¥3500</b><br>
     - FREE DRINK &amp; FOOD -<br>
     @ WPÜ GALLERY SHINJUKU
@@ -294,7 +294,7 @@
 <script>
 /* ====== 設定：ここを差し替え ====== */
 const CHOSEISAN_URL = "https://chouseisan.com/s?h=2cec6dfdc7f34e39b1d4e9bb5a665d97"; // ← 調整さん本番URL
-const ACCESS_CODE   = "42";  // ← members only の合言葉
+// const ACCESS_CODE = "42";  // ← members only の合言葉（現在は未使用：ENTERボタンで直接遷移する方式に変更したため）
 /* フライヤー画像を背景に使うか。false = canvas銀河＋HTMLテキスト（推奨） */
 const USE_FLYER = false;
 /* フライヤー画像の候補（USE_FLYER=true のとき使用・大文字小文字対応） */
@@ -523,7 +523,7 @@ function revealAll(){
 setTimeout(type,500);
 
 /* ====== カウントダウン (JST固定) ====== */
-const target=new Date('2026-07-03T18:00:00+09:00').getTime();
+const target=new Date('2026-07-03T18:30:00+09:00').getTime();
 function tick(){
   let diff=target-Date.now();if(diff<0)diff=0;
   document.getElementById('d').textContent=String(Math.floor(diff/86400000));
