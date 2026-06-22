@@ -185,17 +185,8 @@
     <div class="box"><div class="num" id="s">--</div><div class="unit">SEC</div></div>
   </div>
 
-  <div class="gate reveal" id="r6">
-    <div class="gate-head">— MEMBERS ONLY —</div>
-    <div class="gate-cmd">$ access --members-only</div>
-    <form class="gate-form" id="gateForm" autocomplete="off" onsubmit="return submitCode(event)">
-      <span class="gate-prompt">&gt;</span>
-      <input id="code" class="gate-input" type="text" inputmode="numeric"
-             maxlength="8" placeholder="ACCESS CODE" aria-label="access code">
-      <button class="gate-btn" type="submit">ENTER →</button>
-    </form>
-    <div class="gate-msg" id="gateMsg"></div>
-  </div>
+  <a class="enter reveal join-link" id="r6" target="_blank" rel="noopener">ENTER THE GALAXY<span class="arrow">→</span></a>
+  <div class="enter-note reveal" id="r6b">参加確認（調整さん）へ進む</div>
 
   <div class="map-wrap reveal" id="r7">
     <h3>&gt; VENUE / ACCESS</h3>
@@ -221,6 +212,8 @@
     <div class="cta-a">→ Discord <b>@hirosuzu</b> まで</div>
   </div>
 
+  <a class="enter reveal join-link" id="r7c" target="_blank" rel="noopener">参加確認はこちら<span class="arrow">→</span></a>
+
   <div class="footer reveal" id="r8">$ all devs welcome — let's build smth</div>
 </div>
 
@@ -233,26 +226,8 @@ const USE_FLYER = false;
 /* フライヤー画像の候補（USE_FLYER=true のとき使用・大文字小文字対応） */
 const FLYER_CANDIDATES = ["flyer.png","flyer.PNG","flyer.jpg","flyer.JPG","flyer.jpeg","flyer.webp"];
 
-/* ====== MEMBERS ONLY：合言葉チェック ====== */
-function submitCode(e){
-  e.preventDefault();
-  const input=document.getElementById('code');
-  const msg=document.getElementById('gateMsg');
-  const form=document.getElementById('gateForm');
-  const v=input.value.trim();
-  if(v===ACCESS_CODE){
-    form.classList.add('ok');
-    msg.style.color='var(--term)';
-    msg.textContent='ACCESS GRANTED — welcome, dev. entering the galaxy…';
-    setTimeout(()=>{ window.location.href=CHOSEISAN_URL; }, 1100);
-  }else{
-    form.classList.remove('shake'); void form.offsetWidth; form.classList.add('shake');
-    msg.style.color='#ff6b6b';
-    msg.textContent='ACCESS DENIED — code "'+(v||'(空欄)')+'" is not recognized.';
-    input.select();
-  }
-  return false;
-}
+/* ====== 参加ボタン：調整さんURLを設定 ====== */
+document.querySelectorAll('.join-link').forEach(a=>{ a.href=CHOSEISAN_URL; });
 
 /* ====== フライヤー画像の有無を判定（候補を順に試す） ====== */
 let HAS_FLYER=false;
@@ -378,7 +353,7 @@ function type(){
     setTimeout(revealAll,350);}
 }
 function revealAll(){
-  ['r1','r2','r3','r4','r5','r5b','r6','r7','r7b','r8'].forEach((id,i)=>
+  ['r1','r2','r3','r4','r5','r5b','r6','r6b','r7','r7b','r7c','r8'].forEach((id,i)=>
     setTimeout(()=>{const el=document.getElementById(id);if(el)el.classList.add('in');},i*220));
 }
 setTimeout(type,500);
