@@ -120,8 +120,10 @@
   .map-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;filter:saturate(.9)}
   .map-link{display:inline-block;margin-top:12px;font-size:12px;color:var(--blue);
     text-decoration:none;border-bottom:1px dashed var(--blue)}
-  .lineup{margin-top:38px;width:100%;max-width:420px}
-  .lineup h3{font-size:12px;letter-spacing:3px;color:var(--blue);margin-bottom:14px}
+  .contents-intro{margin-top:38px;width:100%;max-width:420px;font-size:20px;line-height:1.9;
+    letter-spacing:3px;font-weight:bold;color:#eaf3ff;text-shadow:0 0 8px rgba(0,0,0,.9)}
+  .lineup{margin-top:20px;width:100%;max-width:420px}
+  .lineup h3{font-size:12px;letter-spacing:3px;color:#fff;margin-bottom:14px}
   .line-list{list-style:none;display:flex;flex-direction:column;gap:10px}
   .line-list li{display:flex;align-items:center;gap:12px;text-align:left;
     padding:11px 14px;border:1px solid rgba(90,169,255,.3);border-radius:12px;
@@ -130,6 +132,9 @@
     letter-spacing:1px;color:#001018;background:var(--blue);border-radius:7px;
     padding:5px 0;min-width:46px;text-align:center;box-shadow:0 0 12px rgba(90,169,255,.5)}
   .line-list .ld{font-size:14px;color:#fff;letter-spacing:.5px}
+  .line-list .ld.ld-lg{font-size:20px}
+  .line-list .ld-sub{display:block;margin-top:7px;font-family:var(--font-term);
+    font-size:12px;line-height:1.9;color:var(--txt);letter-spacing:.5px}
   .line-more{margin-top:12px;font-size:12px;color:#90a8d0;letter-spacing:3px}
 
   /* 宇宙みくじ（縁日ガチャ）*/
@@ -245,11 +250,13 @@
     </div>
   </div>
 
+  <p class="contents-intro reveal" id="r6b">42生みんなでパーティーをします！<br>世代を超えた交流を楽しみましょう！</p>
+
   <div class="lineup reveal" id="r6c">
     <h3>&gt; CONTENTS</h3>
     <ul class="line-list">
-      <li><span class="tag">DJ</span><span class="ld">Cosmic Disco</span></li>
-      <li><span class="tag">LT</span><span class="ld">42 OB による LTトーク会</span></li>
+      <li><span class="tag">DJ</span><span class="ld">Cosmic Disco<span class="ld-sub">18:30-19:30 mokabe<br>19:30-20:30 あっぷるささき<br>20:30-21:30 Rt3mis</span></span></li>
+      <li><span class="tag">EVENT</span><span class="ld ld-lg">夏祭り</span></li>
       <li><span class="tag">VJ</span><span class="ld">Sound Visualizer</span></li>
       <li><span class="tag">FOOD</span><span class="ld">Free Drink &amp; Food</span></li>
     </ul>
@@ -286,7 +293,7 @@
     <div class="cta-a">→ Discord <b>@hirosuzu</b> まで</div>
   </div>
 
-  <a class="enter reveal join-link" id="r7c" target="_blank" rel="noopener">参加確認はこちら<span class="arrow">→</span></a>
+  <a class="enter reveal join-link" id="r7c" target="_blank" rel="noopener">ENTER THE GALAXY<span class="arrow">→</span></a>
 
   <div class="footer reveal" id="r8">$ all devs welcome — let's build smth</div>
 </div>
@@ -345,8 +352,6 @@ const OMIKUJI=[
   {lv:'吉',msg:'迷ったら話しかけてみよう。良い縁が待っている。'},
   {lv:'大大吉',msg:'今夜のあなたは銀河の中心。誰かの伝説になる夜。'}
 ];
-const OMK_KEY='omikuji-2026-07-03';
-let drawnFortune=null;
 function renderOmikuji(o,animate){
   const card=document.getElementById('omikujiCard');
   const big=(o.lv==='大吉'||o.lv==='大大吉')?' daikichi':'';
@@ -354,21 +359,13 @@ function renderOmikuji(o,animate){
   card.classList.add('show');
   if(animate){card.classList.remove('show');void card.offsetWidth;card.classList.add('show');}
   const btn=document.querySelector('.omikuji-btn');
-  if(btn){btn.disabled=true;btn.classList.add('drawn');btn.textContent='宇宙おみくじ';}
+  if(btn)btn.textContent='もう一度引く';
 }
 function drawOmikuji(){
-  if(drawnFortune){renderOmikuji(drawnFortune,false);return;}   // 一度引いたら固定
-  let saved=null;try{saved=localStorage.getItem(OMK_KEY);}catch(e){}
-  if(saved){try{drawnFortune=JSON.parse(saved);}catch(e){}}
-  if(!drawnFortune){
-    drawnFortune=OMIKUJI[Math.floor(Math.random()*OMIKUJI.length)];
-    try{localStorage.setItem(OMK_KEY,JSON.stringify(drawnFortune));}catch(e){}
-  }
-  renderOmikuji(drawnFortune,true);
+  // 毎回ランダム抽選・何度でも引ける（固定・保存はしない）
+  const o=OMIKUJI[Math.floor(Math.random()*OMIKUJI.length)];
+  renderOmikuji(o,true);
 }
-/* 再読込時：既に引いていれば同じ結果を復元 */
-(function(){let saved=null;try{saved=localStorage.getItem(OMK_KEY);}catch(e){}
-  if(saved){try{drawnFortune=JSON.parse(saved);renderOmikuji(drawnFortune,false);}catch(e){}}})();
 
 /* ====== フライヤー画像の有無を判定（候補を順に試す） ====== */
 let HAS_FLYER=false;
@@ -517,7 +514,7 @@ function type(){
     setTimeout(revealAll,350);}
 }
 function revealAll(){
-  ['r1','r2','r3','r4','r5','r5b','r6','r7d','r6c','r6d','r7','r7b','r7c','r8'].forEach((id,i)=>
+  ['r1','r2','r3','r4','r5','r5b','r6','r7d','r6b','r6c','r6d','r7','r7b','r7c','r8'].forEach((id,i)=>
     setTimeout(()=>{const el=document.getElementById(id);if(el)el.classList.add('in');},i*220));
 }
 setTimeout(type,500);
